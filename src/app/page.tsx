@@ -94,18 +94,25 @@ const navLinks = [
 
 // Floating particles component
 const FloatingParticles = () => {
+  const [positions, setPositions] = useState<{x: number, y: number}[]>([]);
+  useEffect(() => {
+    // Generate stable random positions on client only
+    const arr = Array.from({ length: 15 }, () => ({
+      x: Math.random() * window.innerWidth,
+      y: Math.random() * window.innerHeight,
+    }));
+    setPositions(arr);
+  }, []);
+  if (positions.length === 0) return null;
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {[...Array(15)].map((_, i) => (
+      {positions.map((pos, i) => (
         <motion.div
           key={i}
           className="absolute w-1 h-1 bg-emerald-400/20 rounded-full"
-          initial={{
-            x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1200),
-            y: Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 800),
-          }}
+          style={{ left: pos.x, top: pos.y }}
           animate={{
-            y: [null, -100, -200],
+            y: [0, -100, -200],
             opacity: [0, 1, 0],
           }}
           transition={{
