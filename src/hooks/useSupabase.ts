@@ -1,3 +1,6 @@
+// Supabase hooks for the Elghella marketplace
+// This file contains all the custom hooks for interacting with Supabase
+
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabaseClient'
 import { useAuth } from '@/contexts/AuthContext'
