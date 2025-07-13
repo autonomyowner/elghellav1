@@ -20,7 +20,10 @@ export default function EquipmentCard({ equipment }: EquipmentCardProps) {
     model,
     year,
     currency = 'JOD',
-    is_available
+    is_available,
+    seller_name,
+    seller_phone,
+    seller_location
   } = equipment
 
   // Format price as currency
@@ -71,6 +74,15 @@ export default function EquipmentCard({ equipment }: EquipmentCardProps) {
 
         <div className="flex flex-col flex-grow p-4">
           <h3 className="text-lg font-bold text-white mb-2 line-clamp-2">{title}</h3>
+
+          {/* Seller Info */}
+          {(seller_name || seller_phone || seller_location) && (
+            <div className="mb-2 text-xs text-green-300">
+              {seller_name && <div>البائع: {seller_name}</div>}
+              {seller_phone && <div>الهاتف: {seller_phone}</div>}
+              {seller_location && <div>موقع البائع: {seller_location}</div>}
+            </div>
+          )}
 
           <div className="flex flex-col mt-auto pt-2">
             {/* Brand, Model, Year */}
