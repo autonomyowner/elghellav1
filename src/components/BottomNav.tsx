@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Search, Plus, User, Grid3X3 } from 'lucide-react';
+import { Home, Search, Plus, User, Grid } from 'lucide-react';
 
 const BottomNav: React.FC = () => {
   const pathname = usePathname();
@@ -31,7 +31,7 @@ const BottomNav: React.FC = () => {
     {
       href: '/equipment-rental',
       label: 'المعدات',
-      icon: Grid3X3,
+      icon: Grid,
       isActive: pathname === '/equipment-rental'
     },
     {
