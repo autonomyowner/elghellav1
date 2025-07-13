@@ -63,6 +63,9 @@ export type Database = {
           images: string[]
           is_available: boolean
           is_featured: boolean
+          seller_name: string | null
+          seller_phone: string | null
+          seller_location: string | null
         }
         Insert: {
           id?: string
@@ -83,6 +86,9 @@ export type Database = {
           images?: string[]
           is_available?: boolean
           is_featured?: boolean
+          seller_name?: string | null
+          seller_phone?: string | null
+          seller_location?: string | null
         }
         Update: {
           updated_at?: string
@@ -100,6 +106,9 @@ export type Database = {
           images?: string[]
           is_available?: boolean
           is_featured?: boolean
+          seller_name?: string | null
+          seller_phone?: string | null
+          seller_location?: string | null
         }
         Relationships: [
           {

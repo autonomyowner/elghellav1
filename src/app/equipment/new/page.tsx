@@ -7,7 +7,7 @@ import { createClient } from '@/lib/supabase/client'
 import { EquipmentInsert } from '@/types/database.types'
 
 export default function EquipmentForm() {
-  const { user } = useAuth()
+  const { user, profile } = useAuth()
   const router = useRouter()
   const supabase = createClient()
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -115,6 +115,9 @@ export default function EquipmentForm() {
         currency: 'JOD',
         is_available: true,
         is_featured: false,
+        seller_name: profile?.full_name || null,
+        seller_phone: profile?.phone || null,
+        seller_location: profile?.location || null,
       }
 
       const { error: insertError } = await supabase
