@@ -12,7 +12,6 @@
   - User profiles with ratings and verification
   - Equipment listings with categories and filters
   - Land listings for agricultural plots
-  - Messaging system for user communication
   - Favorites system for saved listings
   - Reviews and ratings system
   - File storage for images and documents
@@ -37,7 +36,7 @@
 
 ### 5. Database Schema Features
 - **Row Level Security (RLS)**: All tables have proper security policies
-- **Real-time Subscriptions**: Support for live updates on messages and equipment
+- **Real-time Subscriptions**: Support for live updates on equipment
 - **File Storage**: Configured buckets for equipment images, avatars, and documents
 - **Performance Optimization**: Proper indexing and query optimization
 - **Triggers and Functions**: Automated profile creation and rating updates
@@ -49,16 +48,15 @@
 2. **equipment** - Agricultural equipment listings
 3. **land_listings** - Land for sale/rent
 4. **categories** - Equipment categories
-5. **messages** - User-to-user communication
-6. **favorites** - Saved listings
-7. **reviews** - User ratings and feedback
+5. **favorites** - Saved listings
+6. **reviews** - User ratings and feedback
 
 ### Key Features Implemented:
 - **Advanced Filtering**: Category, location, price, condition, brand, year
 - **Search System**: Full-text search with auto-suggestions
 - **User Management**: Profile creation, updates, and verification
 - **File Management**: Image uploads with proper storage policies
-- **Real-time Updates**: Live notifications for messages and updates
+- **Real-time Updates**: Live notifications for equipment updates
 
 ## 📋 Next Steps Required
 

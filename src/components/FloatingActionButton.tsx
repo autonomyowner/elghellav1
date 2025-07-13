@@ -23,7 +23,7 @@ const FloatingActionButton: React.FC = () => {
     {
       icon: MessageCircle,
       label: 'المحادثات',
-      href: '/messages',
+      href: '/contact',
       color: 'bg-purple-500 hover:bg-purple-600'
     },
     {

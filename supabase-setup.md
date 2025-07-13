@@ -181,40 +181,7 @@ CREATE POLICY "Users can delete their own land listings" ON land_listings
     FOR DELETE USING (auth.uid() = user_id);
 ```
 
-### 2.6 Create Messages Table
-
-```sql
--- Messages table for user communication
-CREATE TABLE IF NOT EXISTS messages (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    sender_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
-    recipient_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
-    listing_id UUID, -- Can reference equipment or land_listings
-    listing_type VARCHAR(20) CHECK (listing_type IN ('equipment', 'land')),
-    subject VARCHAR(255),
-    content TEXT NOT NULL,
-    is_read BOOLEAN DEFAULT FALSE,
-    attachments TEXT[] DEFAULT '{}',
-    message_type VARCHAR(20) DEFAULT 'inquiry' CHECK (message_type IN ('inquiry', 'offer', 'response', 'general'))
-);
-
--- Enable RLS
-ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
-
--- Policies for messages
-CREATE POLICY "Users can view their own messages" ON messages
-    FOR SELECT USING (auth.uid() = sender_id OR auth.uid() = recipient_id);
-
-CREATE POLICY "Users can insert messages" ON messages
-    FOR INSERT WITH CHECK (auth.uid() = sender_id);
-
-CREATE POLICY "Users can update their received messages" ON messages
-    FOR UPDATE USING (auth.uid() = recipient_id);
-```
-
-### 2.7 Create Favorites Table
+### 2.6 Create Favorites Table
 
 ```sql
 -- Favorites table for saved listings
@@ -241,7 +208,7 @@ CREATE POLICY "Users can delete their own favorites" ON favorites
     FOR DELETE USING (auth.uid() = user_id);
 ```
 
-### 2.8 Create Reviews Table
+### 2.7 Create Reviews Table
 
 ```sql
 -- Reviews table for user ratings
@@ -287,10 +254,6 @@ CREATE INDEX IF NOT EXISTS idx_land_listings_user_id ON land_listings(user_id);
 CREATE INDEX IF NOT EXISTS idx_land_listings_location ON land_listings(location);
 CREATE INDEX IF NOT EXISTS idx_land_listings_price ON land_listings(price);
 CREATE INDEX IF NOT EXISTS idx_land_listings_created_at ON land_listings(created_at DESC);
-
-CREATE INDEX IF NOT EXISTS idx_messages_sender_id ON messages(sender_id);
-CREATE INDEX IF NOT EXISTS idx_messages_recipient_id ON messages(recipient_id);
-CREATE INDEX IF NOT EXISTS idx_messages_created_at ON messages(created_at DESC);
 
 CREATE INDEX IF NOT EXISTS idx_favorites_user_id ON favorites(user_id);
 CREATE INDEX IF NOT EXISTS idx_reviews_reviewee_id ON reviews(reviewee_id);
@@ -470,9 +433,6 @@ Enable the following in Supabase Dashboard > Authentication > Providers:
 Enable real-time for tables that need live updates:
 
 ```sql
--- Enable real-time for messages
-ALTER PUBLICATION supabase_realtime ADD TABLE messages;
-
 -- Enable real-time for equipment updates
 ALTER PUBLICATION supabase_realtime ADD TABLE equipment;
 ```
@@ -494,4 +454,4 @@ ALTER PUBLICATION supabase_realtime ADD TABLE equipment;
 5. Set up storage buckets and policies
 6. Configure email templates and authentication providers
 
-This setup provides a complete backend for the Elghella agricultural marketplace with user authentication, equipment listings, land listings, messaging, favorites, and reviews functionality.
+This setup provides a complete backend for the Elghella agricultural marketplace with user authentication, equipment listings, land listings, favorites, and reviews functionality.

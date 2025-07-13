@@ -54,9 +54,8 @@ Run these in your Supabase SQL Editor:
 1. **Categories** - Equipment categories
 2. **Profiles** - User profiles 
 3. **Equipment** - Equipment listings
-4. **Messages** - User communication
-5. **Favorites** - Saved listings
-6. **Reviews** - User ratings
+4. **Favorites** - Saved listings
+5. **Reviews** - User ratings
 
 ### Features Ready:
 - ✅ User authentication
@@ -87,7 +86,6 @@ The connection is already working! You should see:
 ### 3. Test Features
 After setting up the database:
 - Create equipment listings
-- Send messages between users
 - Add items to favorites
 - Leave reviews and ratings
 
