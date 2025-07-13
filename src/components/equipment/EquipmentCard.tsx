@@ -19,7 +19,7 @@ export default function EquipmentCard({ equipment }: EquipmentCardProps) {
     brand,
     model,
     year,
-    currency = 'JOD',
+    currency = 'DZD',
     is_available,
     seller_name,
     seller_phone,
@@ -27,7 +27,7 @@ export default function EquipmentCard({ equipment }: EquipmentCardProps) {
   } = equipment
 
   // Format price as currency
-  const formattedPrice = new Intl.NumberFormat('ar-JO', {
+  const formattedPrice = new Intl.NumberFormat('ar-DZ', {
     style: 'currency',
     currency: currency,
     maximumFractionDigits: 0,

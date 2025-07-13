@@ -112,7 +112,7 @@ export default function EquipmentForm() {
         hours_used: formData.hours_used ? parseInt(formData.hours_used) : null,
         images: imageUrls,
         category_id: 'default', // You'll need to implement category selection
-        currency: 'JOD',
+        currency: 'DZD',
         is_available: true,
         is_featured: false,
         seller_name: profile?.full_name || null,
@@ -187,7 +187,7 @@ export default function EquipmentForm() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label htmlFor="price" className="block text-sm font-medium text-gray-200 mb-2">
-                  السعر (دينار أردني) *
+                  السعر (دينار جزائري) *
                 </label>
                 <input
                   id="price"

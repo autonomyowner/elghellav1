@@ -23,9 +23,9 @@ export default async function EquipmentDetailPage({ params: { id } }: PageProps)
   }
 
   // Format price as currency
-  const formattedPrice = new Intl.NumberFormat('ar-JO', {
+  const formattedPrice = new Intl.NumberFormat('ar-DZ', {
     style: 'currency',
-    currency: equipment.currency || 'JOD',
+    currency: equipment.currency || 'DZD',
     maximumFractionDigits: 0,
   }).format(equipment.price)
 
