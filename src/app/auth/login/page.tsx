@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { useAuth } from '@/contexts/AuthContext'
-import { supabase } from '@/lib/supabaseClient'
 import { 
   Eye, EyeOff, Mail, Lock, ArrowRight, ArrowLeft, 
   Tractor, Shield, Users, Zap, CheckCircle, Star,
