@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { supabase } from '@/lib/supabaseClient'
 import { useAuth } from '@/contexts/AuthContext'
 import { Equipment, Profile, Category } from '@/types/database.types'
 
@@ -16,7 +16,6 @@ export function useEquipment(filters?: {
   const [equipment, setEquipment] = useState<Equipment[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const supabase = createClient()
 
   useEffect(() => {
     async function fetchEquipment() {
@@ -79,7 +78,6 @@ export function useEquipment(filters?: {
   }, [filters])
 
   const refetch = async () => {
-    // Refetch function will be implemented in the effect
     setLoading(true)
     try {
       let query = supabase
@@ -142,7 +140,6 @@ export function useEquipmentById(id: string) {
   const [equipment, setEquipment] = useState<Equipment | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const supabase = createClient()
 
   useEffect(() => {
     async function fetchEquipment() {
@@ -179,7 +176,6 @@ export function useProfile(userId?: string) {
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const supabase = createClient()
   const { user } = useAuth()
 
   const targetUserId = userId || user?.id
@@ -234,7 +230,6 @@ export function useCategories() {
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const supabase = createClient()
 
   useEffect(() => {
     async function fetchCategories() {
@@ -264,7 +259,6 @@ export function useUserEquipment(userId?: string) {
   const [equipment, setEquipment] = useState<Equipment[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const supabase = createClient()
   const { user } = useAuth()
 
   const targetUserId = userId || user?.id
@@ -363,7 +357,6 @@ export function useSearch(query: string, limit = 10) {
   const [suggestions, setSuggestions] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const supabase = createClient()
 
   useEffect(() => {
     if (!query || query.length < 2) {
@@ -432,7 +425,6 @@ export function useSearch(query: string, limit = 10) {
 export function useFileUpload() {
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const supabase = createClient()
 
   const uploadEquipmentImage = async (file: File, equipmentId: string, userId: string) => {
     try {
@@ -501,7 +493,6 @@ export function useStats() {
   })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const supabase = createClient()
 
   useEffect(() => {
     async function fetchStats() {

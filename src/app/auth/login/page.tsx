@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { useAuth } from '@/contexts/AuthContext'
+import { supabase } from '@/lib/supabaseClient'
 import { 
   Eye, EyeOff, Mail, Lock, ArrowRight, ArrowLeft, 
   Tractor, Shield, Users, Zap, CheckCircle, Star,
@@ -95,8 +96,8 @@ export default function LoginPage() {
             key={i}
             className="absolute w-2 h-2 bg-green-400/20 rounded-full"
             initial={{ 
-              x: Math.random() * window.innerWidth,
-              y: Math.random() * window.innerHeight,
+              x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1000),
+              y: Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 1000),
               opacity: 0
             }}
             animate={{

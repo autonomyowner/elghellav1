@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { createClient } from '@/lib/supabase/client'
+import { supabase } from '@/lib/supabaseClient'
 import { ProfileInsert } from '@/types/database.types'
 import { 
   Eye, EyeOff, Mail, Lock, ArrowRight, ArrowLeft, User, Phone, MapPin,
@@ -30,7 +30,6 @@ export default function SignupPage() {
   const [currentStep, setCurrentStep] = useState(1)
   
   const router = useRouter()
-  const supabase = createClient()
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
