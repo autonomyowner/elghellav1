@@ -1,198 +1,375 @@
 'use client'
 
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { motion } from 'framer-motion'
 import { useAuth } from '@/contexts/AuthContext'
-import { createClient } from '@/lib/supabase/client'
-import { Equipment } from '@/types/database.types'
-import { useEffect, useState } from 'react'
+import { useProfile, useUserEquipment, useCategories, useStats } from '@/hooks/useSupabase'
+import { 
+  User, Settings, Plus, Package, BarChart3, MessageCircle, 
+  Heart, Star, Tractor, ArrowLeft, Edit3, Trash2, Eye,
+  MapPin, Calendar, DollarSign, Phone, Mail, Globe
+} from 'lucide-react'
 import Link from 'next/link'
-import EquipmentCard from '@/components/equipment/EquipmentCard'
 
 export default function DashboardPage() {
-  const { user, profile, loading: authLoading } = useAuth()
-  const [equipment, setEquipment] = useState<Equipment[]>([])
-  const [loading, setLoading] = useState(true)
-  const supabase = createClient()
+  const { user, signOut } = useAuth()
+  const router = useRouter()
+  const { profile, loading: profileLoading, updateProfile } = useProfile()
+  const { equipment, loading: equipmentLoading, deleteEquipment } = useUserEquipment()
+  const { categories } = useCategories()
+  const { stats } = useStats()
+  const [activeTab, setActiveTab] = useState('overview')
 
   useEffect(() => {
-    if (user) {
-      fetchUserEquipment()
+    if (!user) {
+      router.push('/auth/login')
     }
-  }, [user])
+  }, [user, router])
 
-  const fetchUserEquipment = async () => {
-    if (!user) return
+  const handleSignOut = async () => {
+    await signOut()
+    router.push('/')
+  }
 
-    try {
-      const { data, error } = await supabase
-        .from('equipment')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-
-      if (error) throw error
-      setEquipment(data || [])
-    } catch (error) {
-      console.error('Error fetching equipment:', error)
-    } finally {
-      setLoading(false)
+  const handleDeleteEquipment = async (id: string) => {
+    if (confirm('هل أنت متأكد من حذف هذا العنصر؟')) {
+      await deleteEquipment(id)
     }
   }
 
-  if (authLoading) {
-    return (
-      <div className="flex justify-center items-center min-h-[50vh]">
-        <div className="h-10 w-10 border-4 border-green-500/30 border-t-green-500 rounded-full animate-spin"></div>
-      </div>
-    )
-  }
+  const tabs = [
+    { id: 'overview', name: 'نظرة عامة', icon: <BarChart3 className="w-5 h-5" /> },
+    { id: 'equipment', name: 'معداتي', icon: <Package className="w-5 h-5" /> },
+    { id: 'messages', name: 'الرسائل', icon: <MessageCircle className="w-5 h-5" /> },
+    { id: 'favorites', name: 'المفضلة', icon: <Heart className="w-5 h-5" /> },
+    { id: 'profile', name: 'الملف الشخصي', icon: <User className="w-5 h-5" /> },
+    { id: 'settings', name: 'الإعدادات', icon: <Settings className="w-5 h-5" /> },
+  ]
 
   if (!user) {
     return (
-      <div className="text-center py-12">
-        <h1 className="text-2xl font-bold text-white mb-4">يجب تسجيل الدخول أولاً</h1>
-        <Link
-          href="/auth/login"
-          className="inline-block px-6 py-3 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-md hover:from-green-500 hover:to-green-400 transition"
-        >
-          تسجيل الدخول
-        </Link>
+      <div className="min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a1a] to-[#0a0a0a] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-400"></div>
       </div>
     )
   }
 
   return (
-    <div className="container mx-auto px-4 py-8" dir="rtl">
-      {/* Welcome Section */}
-      <div className="bg-black/50 backdrop-blur-lg border border-green-500/30 rounded-xl p-6 mb-8">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
-          <div>
-            <h1 className="text-3xl font-bold text-white mb-2">
-              مرحباً {profile?.full_name || 'بك'}
-            </h1>
-            <p className="text-gray-400">
-              {profile?.location && `📍 ${profile.location}`}
-              {profile?.phone && ` • 📱 ${profile.phone}`}
-            </p>
-          </div>
-          <div className="mt-4 md:mt-0 flex flex-wrap gap-3">
-            <Link
-              href="/profile"
-              className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-md transition"
-            >
-              إدارة الحساب
-            </Link>
-            <Link
-              href="/equipment/new"
-              className="px-4 py-2 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-400 text-white rounded-md transition"
-            >
-              إضافة معدات
-            </Link>
-            <Link
-              href="/land/new"
-              className="px-4 py-2 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-400 text-white rounded-md transition"
-            >
-              إضافة أراضي
-            </Link>
-          </div>
-        </div>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-black/30 border border-green-500/20 rounded-xl p-6 text-center">
-          <div className="text-3xl font-bold text-green-400 mb-2">{equipment.length}</div>
-          <div className="text-gray-400">المعدات المعروضة</div>
-        </div>
-        <div className="bg-black/30 border border-green-500/20 rounded-xl p-6 text-center">
-          <div className="text-3xl font-bold text-green-400 mb-2">0</div>
-          <div className="text-gray-400">الأراضي المعروضة</div>
-        </div>
-        <div className="bg-black/30 border border-green-500/20 rounded-xl p-6 text-center">
-          <div className="text-3xl font-bold text-green-400 mb-2">
-            {equipment.filter(eq => eq.is_available).length}
-          </div>
-          <div className="text-gray-400">الإعلانات النشطة</div>
-        </div>
-      </div>
-
-      {/* Equipment Section */}
-      <div className="mb-10">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-white">المعدات المعروضة</h2>
-          <Link
-            href="/equipment/new"
-            className="text-green-400 hover:text-green-300 transition flex items-center gap-2"
-          >
-            <span>إضافة معدات جديدة</span>
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-          </Link>
-        </div>
-
-        {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="bg-black/30 border border-green-500/20 rounded-xl p-6 animate-pulse">
-                <div className="aspect-video bg-gray-700 rounded-md mb-4"></div>
-                <div className="h-4 bg-gray-700 rounded mb-2"></div>
-                <div className="h-4 bg-gray-700 rounded w-2/3"></div>
+    <div className="min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a1a] to-[#0a0a0a]" dir="rtl">
+      {/* Header */}
+      <header className="bg-black/30 backdrop-blur-lg border-b border-green-500/30">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Link href="/" className="flex items-center gap-2 text-white hover:text-green-400 transition-colors">
+                <ArrowLeft className="w-5 h-5" />
+                <span>العودة للرئيسية</span>
+              </Link>
+              <div className="flex items-center gap-2">
+                <Tractor className="w-8 h-8 text-green-400" />
+                <span className="text-2xl font-bold text-white">لوحة التحكم</span>
               </div>
-            ))}
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="text-white text-sm">
+                مرحباً، {profile?.full_name || user.email}
+              </div>
+              <button
+                onClick={handleSignOut}
+                className="px-4 py-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition-colors"
+              >
+                تسجيل الخروج
+              </button>
+            </div>
           </div>
-        ) : equipment.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {equipment.map((item) => (
-              <EquipmentCard key={item.id} equipment={item} />
-            ))}
-          </div>
-        ) : (
-          <div className="bg-black/30 border border-green-500/20 rounded-xl p-12 text-center">
-            <div className="text-6xl text-gray-600 mb-4">🚜</div>
-            <h3 className="text-xl font-bold text-white mb-2">لا توجد معدات معروضة</h3>
-            <p className="text-gray-400 mb-6">ابدأ بإضافة أول معدة زراعية لك</p>
-            <Link
-              href="/equipment/new"
-              className="inline-block px-6 py-3 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-400 text-white rounded-md transition"
-            >
-              إضافة معدات جديدة
-            </Link>
-          </div>
-        )}
-      </div>
+        </div>
+      </header>
 
-      {/* Quick Actions */}
-      <div className="bg-black/30 border border-green-500/20 rounded-xl p-6">
-        <h3 className="text-xl font-bold text-white mb-4">إجراءات سريعة</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Link
-            href="/equipment"
-            className="flex items-center gap-3 p-4 bg-black/50 hover:bg-black/70 border border-green-500/20 rounded-lg transition"
-          >
-            <span className="text-2xl">🔍</span>
-            <span className="text-white">تصفح المعدات</span>
-          </Link>
-          <Link
-            href="/land"
-            className="flex items-center gap-3 p-4 bg-black/50 hover:bg-black/70 border border-green-500/20 rounded-lg transition"
-          >
-            <span className="text-2xl">🌾</span>
-            <span className="text-white">تصفح الأراضي</span>
-          </Link>
-          <Link
-            href="/profile"
-            className="flex items-center gap-3 p-4 bg-black/50 hover:bg-black/70 border border-green-500/20 rounded-lg transition"
-          >
-            <span className="text-2xl">⚙️</span>
-            <span className="text-white">إعدادات الحساب</span>
-          </Link>
-          <Link
-            href="/help"
-            className="flex items-center gap-3 p-4 bg-black/50 hover:bg-black/70 border border-green-500/20 rounded-lg transition"
-          >
-            <span className="text-2xl">❓</span>
-            <span className="text-white">المساعدة</span>
-          </Link>
+      <div className="container mx-auto px-4 py-8">
+        <div className="grid lg:grid-cols-4 gap-8">
+          {/* Sidebar */}
+          <div className="lg:col-span-1">
+            <div className="glass p-6 rounded-2xl border border-green-500/30 sticky top-8">
+              <nav className="space-y-2">
+                {tabs.map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+                      activeTab === tab.id
+                        ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                        : 'text-white/70 hover:text-white hover:bg-white/10'
+                    }`}
+                  >
+                    {tab.icon}
+                    <span>{tab.name}</span>
+                  </button>
+                ))}
+              </nav>
+            </div>
+          </div>
+
+          {/* Main Content */}
+          <div className="lg:col-span-3">
+            {activeTab === 'overview' && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="space-y-6"
+              >
+                <h1 className="text-3xl font-bold text-white mb-8">نظرة عامة</h1>
+                
+                {/* Stats Cards */}
+                <div className="grid md:grid-cols-3 gap-6">
+                  <div className="glass p-6 rounded-xl border border-green-500/30">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-white/70 text-sm">معداتي</p>
+                        <p className="text-2xl font-bold text-white">{equipment?.length || 0}</p>
+                      </div>
+                      <Package className="w-8 h-8 text-green-400" />
+                    </div>
+                  </div>
+                  <div className="glass p-6 rounded-xl border border-green-500/30">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-white/70 text-sm">المشاهدات</p>
+                                                 <p className="text-2xl font-bold text-white">
+                           {equipment?.reduce((total, item) => total + ((item as any).view_count || 0), 0) || 0}
+                         </p>
+                      </div>
+                      <Eye className="w-8 h-8 text-blue-400" />
+                    </div>
+                  </div>
+                  <div className="glass p-6 rounded-xl border border-green-500/30">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-white/70 text-sm">التقييم</p>
+                                                 <p className="text-2xl font-bold text-white">
+                           {((profile as any)?.rating)?.toFixed(1) || '0.0'}
+                         </p>
+                      </div>
+                      <Star className="w-8 h-8 text-yellow-400" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Recent Equipment */}
+                <div className="glass p-6 rounded-xl border border-green-500/30">
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-xl font-bold text-white">المعدات الحديثة</h2>
+                    <Link
+                      href="/dashboard?tab=equipment"
+                      className="text-green-400 hover:text-green-300 text-sm"
+                    >
+                      عرض الكل
+                    </Link>
+                  </div>
+                  <div className="space-y-4">
+                    {equipment?.slice(0, 3).map((item) => (
+                      <div key={item.id} className="flex items-center gap-4 p-4 bg-black/30 rounded-lg">
+                        <div className="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center">
+                          <Package className="w-6 h-6 text-green-400" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="text-white font-medium">{item.title}</h3>
+                          <p className="text-white/70 text-sm">{item.location}</p>
+                        </div>
+                        <div className="text-left">
+                          <p className="text-green-400 font-bold">{item.price?.toLocaleString()} د.ج</p>
+                                                     <p className="text-white/70 text-sm">{(item as any).view_count || 0} مشاهدة</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {activeTab === 'equipment' && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="space-y-6"
+              >
+                <div className="flex items-center justify-between">
+                  <h1 className="text-3xl font-bold text-white">معداتي</h1>
+                  <button className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
+                    <Plus className="w-5 h-5" />
+                    إضافة معدة جديدة
+                  </button>
+                </div>
+
+                {equipmentLoading ? (
+                  <div className="flex items-center justify-center py-12">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-400"></div>
+                  </div>
+                ) : (
+                  <div className="grid md:grid-cols-2 gap-6">
+                    {equipment?.map((item) => (
+                      <div key={item.id} className="glass p-6 rounded-xl border border-green-500/30">
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="flex-1">
+                            <h3 className="text-white font-semibold text-lg mb-2">{item.title}</h3>
+                            <p className="text-white/70 text-sm mb-2">{item.description}</p>
+                            <div className="flex items-center gap-4 text-sm text-white/70">
+                              <span className="flex items-center gap-1">
+                                <MapPin className="w-4 h-4" />
+                                {item.location}
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <Calendar className="w-4 h-4" />
+                                {item.year}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex gap-2">
+                            <button className="p-2 bg-blue-500/20 text-blue-400 rounded-lg hover:bg-blue-500/30 transition-colors">
+                              <Edit3 className="w-4 h-4" />
+                            </button>
+                            <button 
+                              onClick={() => handleDeleteEquipment(item.id)}
+                              className="p-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition-colors"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-between pt-4 border-t border-white/10">
+                          <div className="flex items-center gap-1">
+                            <DollarSign className="w-4 h-4 text-green-400" />
+                            <span className="text-green-400 font-bold">{item.price?.toLocaleString()} د.ج</span>
+                          </div>
+                          <div className="flex items-center gap-4 text-sm text-white/70">
+                                                         <span className="flex items-center gap-1">
+                               <Eye className="w-4 h-4" />
+                               {(item as any).view_count || 0}
+                             </span>
+                            <span className={`px-2 py-1 rounded-full text-xs ${
+                              item.is_available 
+                                ? 'bg-green-500/20 text-green-400' 
+                                : 'bg-red-500/20 text-red-400'
+                            }`}>
+                              {item.is_available ? 'متاح' : 'غير متاح'}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </motion.div>
+            )}
+
+            {activeTab === 'profile' && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="space-y-6"
+              >
+                <h1 className="text-3xl font-bold text-white">الملف الشخصي</h1>
+                
+                <div className="glass p-8 rounded-xl border border-green-500/30">
+                  {profileLoading ? (
+                    <div className="flex items-center justify-center py-12">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-400"></div>
+                    </div>
+                  ) : (
+                    <div className="space-y-6">
+                      <div className="flex items-center gap-6">
+                        <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center">
+                          <User className="w-10 h-10 text-green-400" />
+                        </div>
+                        <div>
+                          <h2 className="text-2xl font-bold text-white">{profile?.full_name || 'اسم المستخدم'}</h2>
+                          <p className="text-green-400">{profile?.user_type === 'farmer' ? 'مزارع' : profile?.user_type === 'buyer' ? 'مشتري' : 'مزارع وتاجر'}</p>
+                          <div className="flex items-center gap-2 mt-2">
+                            <Star className="w-4 h-4 text-yellow-400" />
+                                                         <span className="text-white/70">{((profile as any)?.rating)?.toFixed(1) || '0.0'} ({(profile as any)?.total_ratings || 0} تقييم)</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="grid md:grid-cols-2 gap-6">
+                        <div className="space-y-4">
+                          <div>
+                            <label className="block text-sm font-medium text-green-300 mb-2">الاسم الكامل</label>
+                            <input
+                              type="text"
+                              value={profile?.full_name || ''}
+                              className="w-full p-3 bg-black/50 text-white rounded-lg border border-white/20 focus:border-green-400 focus:outline-none"
+                              placeholder="أدخل اسمك الكامل"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-green-300 mb-2">رقم الهاتف</label>
+                            <input
+                              type="tel"
+                              value={profile?.phone || ''}
+                              className="w-full p-3 bg-black/50 text-white rounded-lg border border-white/20 focus:border-green-400 focus:outline-none"
+                              placeholder="07xxxxxxxx"
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-4">
+                          <div>
+                            <label className="block text-sm font-medium text-green-300 mb-2">الموقع</label>
+                            <input
+                              type="text"
+                              value={profile?.location || ''}
+                              className="w-full p-3 bg-black/50 text-white rounded-lg border border-white/20 focus:border-green-400 focus:outline-none"
+                              placeholder="المدينة، الولاية"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-green-300 mb-2">نوع الحساب</label>
+                            <select
+                              value={profile?.user_type || 'farmer'}
+                              className="w-full p-3 bg-black/50 text-white rounded-lg border border-white/20 focus:border-green-400 focus:outline-none"
+                            >
+                              <option value="farmer">مزارع</option>
+                              <option value="buyer">مشتري</option>
+                              <option value="both">مزارع وتاجر</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+
+                      <button className="w-full py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors font-medium">
+                        حفظ التغييرات
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            )}
+
+            {/* Placeholder for other tabs */}
+            {activeTab === 'messages' && (
+              <div className="glass p-8 rounded-xl border border-green-500/30 text-center">
+                <MessageCircle className="w-16 h-16 text-green-400 mx-auto mb-4" />
+                <h2 className="text-xl font-bold text-white mb-2">الرسائل</h2>
+                <p className="text-white/70">سيتم إضافة نظام الرسائل قريباً</p>
+              </div>
+            )}
+
+            {activeTab === 'favorites' && (
+              <div className="glass p-8 rounded-xl border border-green-500/30 text-center">
+                <Heart className="w-16 h-16 text-green-400 mx-auto mb-4" />
+                <h2 className="text-xl font-bold text-white mb-2">المفضلة</h2>
+                <p className="text-white/70">سيتم إضافة نظام المفضلة قريباً</p>
+              </div>
+            )}
+
+            {activeTab === 'settings' && (
+              <div className="glass p-8 rounded-xl border border-green-500/30 text-center">
+                <Settings className="w-16 h-16 text-green-400 mx-auto mb-4" />
+                <h2 className="text-xl font-bold text-white mb-2">الإعدادات</h2>
+                <p className="text-white/70">سيتم إضافة الإعدادات قريباً</p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
