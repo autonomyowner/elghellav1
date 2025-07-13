@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence, PanInfo } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Search, Filter, Grid, List, MapPin, Star, Heart, 
   MessageCircle, Phone, Eye, ChevronDown, ChevronRight,
@@ -132,7 +132,7 @@ export default function MobileOptimizedInterface({
   };
 
   // Pinch zoom handler
-  const handlePinch = (event: any, info: PanInfo) => {
+  const handlePinch = (event: any, info: any) => {
     if (!enablePinchZoom) return;
     
     const newScale = Math.max(0.5, Math.min(3, scale + info.delta.y * 0.01));
