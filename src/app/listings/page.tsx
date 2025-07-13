@@ -14,18 +14,30 @@ import { useEquipment } from '@/hooks/useData';
 import ProductCard from '@/components/ProductCard';
 import Loading from '@/components/Loading';
 import { Equipment } from '@/types/database.types';
+import MobileOptimizedInterface, { MobileProductCard } from '@/components/MobileOptimizedInterface';
+import { CameraButton } from '@/components/CameraIntegration';
 
 // Enhanced filter options for Algerian marketplace
 const filterOptions = {
   categories: [
-    { id: 'equipment', name: 'معدات زراعية', count: 2847 },
-    { id: 'seeds', name: 'بذور ونباتات', count: 1923 },
-    { id: 'fertilizers', name: 'أسمدة ومبيدات', count: 876 },
-    { id: 'crops', name: 'محاصيل وحبوب', count: 1456 },
-    { id: 'fruits', name: 'خضروات وفواكه', count: 3241 },
-    { id: 'livestock', name: 'حيوانات المزرعة', count: 1134 },
-    { id: 'tools', name: 'أدوات يدوية', count: 789 },
-    { id: 'transport', name: 'نقل وخدمات', count: 456 }
+    { id: 'tractors', name: 'جرارات', count: 1247 },
+    { id: 'harvesters', name: 'حصادات', count: 892 },
+    { id: 'plows', name: 'محاريث', count: 634 },
+    { id: 'seeders', name: 'بذارات', count: 567 },
+    { id: 'irrigation', name: 'أنظمة الري', count: 489 },
+    { id: 'livestock', name: 'حيوانات المزرعة', count: 423 },
+    { id: 'transport', name: 'نقل وخدمات', count: 378 },
+    { id: 'tools', name: 'أدوات يدوية', count: 345 }
+  ],
+  brands: [
+    { id: 'john-deere', name: 'John Deere', count: 892 },
+    { id: 'case-ih', name: 'Case IH', count: 634 },
+    { id: 'massey-ferguson', name: 'Massey Ferguson', count: 567 },
+    { id: 'new-holland', name: 'New Holland', count: 489 },
+    { id: 'kubota', name: 'Kubota', count: 423 },
+    { id: 'fendt', name: 'Fendt', count: 378 },
+    { id: 'claas', name: 'Claas', count: 345 },
+    { id: 'other', name: 'أخرى', count: 1456 }
   ],
   locations: [
     { id: 'algiers', name: 'الجزائر العاصمة', count: 1245 },
@@ -133,7 +145,10 @@ export default function ListingsPage() {
     category: '',
     location: '',
     condition: '',
+    brand: '',
+    year: '',
     priceRange: '',
+    locationRadius: 50,
     search: ''
   });
   
@@ -164,10 +179,17 @@ export default function ListingsPage() {
     if (filters.condition) {
       filtered = filtered.filter(p => p.condition === filters.condition);
     }
+    if (filters.brand) {
+      filtered = filtered.filter(p => p.brand === filters.brand);
+    }
+    if (filters.year) {
+      filtered = filtered.filter(p => p.year === parseInt(filters.year));
+    }
     if (filters.search) {
       filtered = filtered.filter(p => 
         p.title.toLowerCase().includes(filters.search.toLowerCase()) ||
-        p.description.toLowerCase().includes(filters.search.toLowerCase())
+        p.description.toLowerCase().includes(filters.search.toLowerCase()) ||
+        p.brand.toLowerCase().includes(filters.search.toLowerCase())
       );
     }
 
@@ -230,7 +252,11 @@ export default function ListingsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-emerald-900 to-slate-900 text-white">
+    <MobileOptimizedInterface
+      onSwipeLeft={() => setCurrentPage((prev: number) => Math.min(prev + 1, Math.ceil(totalItems / itemsPerPage)))}
+      onSwipeRight={() => setCurrentPage((prev: number) => Math.max(prev - 1, 1))}
+    >
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-emerald-900 to-slate-900 text-white">
       {/* Header */}
       <div className="bg-black/20 backdrop-blur-md border-b border-white/10 sticky top-0 z-40">
         <div className="container mx-auto px-4 py-6">
@@ -695,5 +721,6 @@ export default function ListingsPage() {
         </div>
       </div>
     </div>
+    </MobileOptimizedInterface>
   );
 }
