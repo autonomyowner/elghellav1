@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { 
   Search, Filter, Grid, List, ChevronRight, 
   Tractor, Leaf, Droplets, Wheat, Apple, 
-  Cow, Wrench, Truck, MapPin, Star, 
+  Heart, Wrench, Truck, MapPin, Star, 
   TrendingUp, Package, Users, Clock
 } from 'lucide-react';
 import Link from 'next/link';
@@ -101,7 +101,7 @@ const categories = [
     id: 'livestock',
     name: 'حيوانات المزرعة',
     description: 'أبقار، أغنام، ماعز، دواجن وجميع حيوانات المزرعة',
-    icon: <Cow className="w-8 h-8" />,
+    icon: <Heart className="w-8 h-8" />,
     color: 'purple',
     gradient: 'from-purple-500 to-indigo-600',
     itemCount: 1134,
